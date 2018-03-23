@@ -1,7 +1,6 @@
 <template>
     <div class="slider_flexbox">
-        <div v-for="(item, index) in list" :key="index" class="slider_flexbox_chlid"  @click="FslideTo(index)">
-            {{item}}
+        <div v-for="(item, index) in list" :key="index" class="slider_flexbox_child"  @click="FslideTo(index)" :class="{active: index === slideActiveIndex}" v-html="item">
         </div>
         <div class="slider_road" :class="'slider_road_'+name">
             <div :class="'slider_active'+slideActiveIndex"></div>
@@ -14,7 +13,7 @@ export default {
   data() {
     return {
       slideActiveIndex: 0,
-      list: ["1", "2", "3", "4"],
+      list: ["<span>123</span>", "<span>123</span>", "<span>123</span>"],
       listLen: 0,
       TransTime: 500,
       TransType: "ease-in",
@@ -69,11 +68,14 @@ export default {
   display: flex;
   justify-content: space-around;
 }
-.slider_flexbox_chlid {
+
+.slider_flexbox_child {
   flex: 1;
   position: relative;
   z-index: 2;
   background: transparent;
+  cursor: pointer;
+  transition: all 500ms ease-in;
 }
 .slider_road {
   display: flex;
@@ -84,6 +86,7 @@ export default {
 }
 .slider_road div {
   height: 100%;
+  box-sizing: border-box;
   transform: translateX(0);
 }
 
