@@ -1,11 +1,15 @@
 <template>
+  <div class="slider_wrapper" :class="'slider_wrapper_'+name">
     <div class="slider_flexbox">
-        <div v-for="(item, index) in list" :key="index" class="slider_flexbox_child"  @click="FslideTo(index)" :class="{active: index === slideActiveIndex}" v-html="item">
-        </div>
-        <div class="slider_road" :class="'slider_road_'+name">
-            <div :class="'slider_active'+slideActiveIndex"></div>
-        </div>
+      <div v-for="(item, index) in list" :key="index" class="slider_flexbox_child"  @click="FslideTo(index)" :class="{active: index === slideActiveIndex}" v-html="item">
+      </div>
+      <div class="slider_road">
+          <div :class="'slider_active'+slideActiveIndex">
+            <div class="slider_road_inner"></div>
+          </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -15,17 +19,24 @@ export default {
       slideActiveIndex: 0,
       list: ["<span>123</span>", "<span>123</span>", "<span>123</span>"],
       listLen: 0,
-      TransTime: 500,
-      TransType: "ease-in",
-      TransActiver: "#000",
+      sliderTime: 0,
+      sliderType: "",
+      sliderActiver: "",
+      tabActiver: '',
       name: '',
     };
   },
   props: {
-    sliderProperty: Object
+    sliderData: Object
   },
   watch: {
-    slideActiveIndex(v, o) {}
+    sliderData: {
+      handler(v, o) {
+        console.log(v)
+        this.renderTime()
+      },
+      deep: true
+    }
   },
   methods: {
     FslideTo(i) {
@@ -44,25 +55,35 @@ export default {
     },
     defaultSetting(obj) {
       this.name = obj.name || Math.random()
-      this.list = obj.list || [1,2,3];
-      this.TransTime = obj.TransTime || 500;
-      this.TransType = obj.TransType || 'ease-in';
-      this.TransActiver = obj.TransActiver || 'background: #000';
+      this.slideActiveIndex = parseInt(obj.slideActiveIndex) <= 12 ? parseInt(obj.slideActiveIndex) : 0 || 0;
+      this.list = obj.tabList || [1,2,3];
+      this.sliderTime = obj.sliderTime || 500;
+      this.sliderType = obj.sliderType || 'linear';
+      this.sliderActiver = obj.sliderActiver || 'background: #000';
+      this.tabActiver = obj.tabActiver || '';
+    },
+    renderTime () {
+      const l = this.list.length;
+      this.defaultSetting(this.sliderData)
+      this.FloadCssCode(
+        `.slider_wrapper_${this.name} .slider_road>div {width: ${100 / this.list.length}%;transition: ${this.sliderTime}ms all ${this.sliderType};}
+        .slider_wrapper_${this.name} .slider_road_inner {${this.sliderActiver};}
+        .slider_wrapper_${this.name} .slider_flexbox_child.active{${this.tabActiver};transition-duration:${this.sliderTime}ms}`
+      );
     }
   },
   mounted() {
-    const l = this.list.length;
-    this.defaultSetting(this.sliderProperty)
-    this.FloadCssCode(
-      `.slider_road.slider_road_${this.name} div {width: ${100 / this.list.length}%;transition: ${
-        this.TransTime
-      }ms all ${this.TransType};${this.TransActiver};}`
-    );
+    this.renderTime()
   }
 };
 </script>
 
 <style scoped>
+
+.slider_wrapper {
+  flex: 1;
+}
+
 .slider_flexbox {
   position: relative;
   display: flex;
@@ -73,9 +94,13 @@ export default {
   flex: 1;
   position: relative;
   z-index: 2;
+  text-align: center;
+  vertical-align: middle;
   background: transparent;
   cursor: pointer;
-  transition: all 500ms ease-in;
+  transition-property: all;
+  transition-timing-function: ease-in;
+  transition-delay: 0;
 }
 .slider_road {
   display: flex;
@@ -84,17 +109,16 @@ export default {
   height: 100%;
   z-index: 1;
 }
-.slider_road div {
+.slider_road>div {
   height: 100%;
-  box-sizing: border-box;
   transform: translateX(0);
 }
+.slider_road_inner {
+  box-sizing: border-box;
+  background-size: cover;
+}
 
-
-
-
-
-
+/* slider-animation */
 .slider_road .slider_active1 {
   transform: translateX(100%);
 }
